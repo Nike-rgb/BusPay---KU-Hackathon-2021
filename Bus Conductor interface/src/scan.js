@@ -1,11 +1,11 @@
 import QrReader from 'react-qr-scanner';
 import React from 'react';
+import ScanResult from './scanresult.js';
 
 export default class Scan extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            deductedAmt : 0,
             scanResult : undefined,
             previousScannedId : null,
         }
@@ -19,7 +19,18 @@ export default class Scan extends React.Component {
     }
 
     handleScan(result) {
-        //handle scan
+        if(result) {
+            let {username, balance, id} = JSON.parse(result.text);
+            if(id === this.state.previousScannedId) return; //preventing multiple scans of the same code
+            this.setState({previousScannedId : id});
+            if(!this.checkBalance(balance)) return this.setState({  //check if the balance is sufficient
+                deductedAmt : 0,
+                scanResult : {
+                    error : 'Not enough Balance',
+                    username,
+                }
+            });
+        }
     }
 
     handleError(err) {
@@ -39,10 +50,10 @@ export default class Scan extends React.Component {
             <div className="scan-container">
             <div className="scan-target">
             <svg width="77" height="259" viewBox="0 0 77 259" fill="none" xmlns="http://www.w3.org/2000/svg">
-                 <path d="M76.5 4H40C20.1178 4 4 20.1178 4 40V76.5M4.00001 182L4 218.5C4 238.382 20.1178 254.5 40 254.5L76.5 254.5" stroke="orange" strokeWidth="6"/>
+                 <path ref={this.scanTargetRef1} d="M76.5 4H40C20.1178 4 4 20.1178 4 40V76.5M4.00001 182L4 218.5C4 238.382 20.1178 254.5 40 254.5L76.5 254.5" stroke="orange" strokeWidth="6"/>
             </svg>
             <svg width="77" height="259" viewBox="0 0 77 259" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M0 254.5H36.5C56.3822 254.5 72.5 238.382 72.5 218.5L72.5 182M72.5 76.5V40C72.5 20.1178 56.3822 4 36.5 4L0 4" stroke="orange" strokeWidth="6"/>
+                <path ref={this.scanTargetRef2} d="M0 254.5H36.5C56.3822 254.5 72.5 238.382 72.5 218.5L72.5 182M72.5 76.5V40C72.5 20.1178 56.3822 4 36.5 4L0 4" stroke="orange" strokeWidth="6"/>
             </svg>
             </div>
           <QrReader
@@ -53,6 +64,7 @@ export default class Scan extends React.Component {
           onScan={this.handleScan}
           />
           </div>
+          <ScanResult scanResult={this.state.scanResult} />
           </>
         );
     }

@@ -6,6 +6,8 @@ function App() {
     <div className="container">
       <Header />
       <Scan />
+
+      
     </div>
   );
 }
