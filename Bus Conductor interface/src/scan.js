@@ -1,16 +1,26 @@
 import QrReader from 'react-qr-scanner';
 import React from 'react';
+import SetDeductedAmt from './setDeductedAmt.js';
 import ScanResult from './scanresult.js';
+import axios from 'axios';
 
 export default class Scan extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            deductedAmt : 0,
             scanResult : undefined,
             previousScannedId : null,
         }
+        this.setDeductedAmt = this.setDeductedAmt.bind(this);
         this.handleError = this.handleError.bind(this);
         this.handleScan = this.handleScan.bind(this);
+    }
+
+    setDeductedAmt (amt) {
+        this.setState({
+            deductedAmt : amt,
+        });
     }
 
     checkBalance(balance) {
@@ -21,6 +31,12 @@ export default class Scan extends React.Component {
     handleScan(result) {
         if(result) {
             let {username, balance, id} = JSON.parse(result.text);
+            if(!this.state.deductedAmt) return this.setState({
+                deductedAmt : 0,
+                scanResult : {
+                    error : 'Enter a fare amount to deduct.'
+                }
+            });
             if(id === this.state.previousScannedId) return; //preventing multiple scans of the same code
             this.setState({previousScannedId : id});
             if(!this.checkBalance(balance)) return this.setState({  //check if the balance is sufficient
@@ -29,6 +45,20 @@ export default class Scan extends React.Component {
                     error : 'Not enough Balance',
                     username,
                 }
+            });
+            document.body.style.background = '#823f82';
+            axios.post('https://buspay.herokuapp.com/conductor/deduct', {
+                id,
+                deductedAmt : this.state.deductedAmt,
+            }).then(res => {
+                document.body.style.background = "";
+                this.setState({
+                    deductedAmt : 0,
+                    scanResult : {
+                        username,
+                        error : '',
+                    }
+                });
             });
         }
     }
@@ -65,6 +95,7 @@ export default class Scan extends React.Component {
           />
           </div>
           <ScanResult scanResult={this.state.scanResult} />
+          <SetDeductedAmt deductedAmt={this.state.deductedAmt} setDeductedAmt={this.setDeductedAmt}/>
           </>
         );
     }
