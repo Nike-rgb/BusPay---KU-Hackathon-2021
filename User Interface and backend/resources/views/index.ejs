@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BusPay</title>
+    <link rel="stylesheet" href="user.css"/>
+    <script type="text/javascript" src="jquery.min.js"></script>
+    <script type="text/javascript" src="qrcode.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/line-awesome/1.3.0/line-awesome/css/line-awesome.min.css" integrity="sha512-vebUliqxrVkBy3gucMhClmyQP9On/HAWQdKDXRaAlb/FKuTbxkjPKUyqVOxAcGwFDka79eTF+YXwfke1h3/wfg==" crossorigin="anonymous" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js" integrity="sha512-bZS47S7sPOxkjU/4Bt0zrhEtWx0y0CRkhEp8IckzK+ltifIIE9EMIMTuT/mEzoIMewUINruDBIR/jJnbguonqQ==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.1.1/socket.io.js" integrity="sha512-oFOCo2/3DtjrJG4N27BjSLQWoiBv171sK6a+JiWjp/7agxC2nCUP358AqzxkBUb5jX8g6CYLPdSKQTbC0weCwA==" crossorigin="anonymous"></script>
+    <script type="module" defer src="user.js"></script>
+    
+</head>
+<body>
+    <div class="container">
+        <h1 class="title"><span style="color:#4BB543;font-size:38px">Bus</span> pay <i style="font-size:40px;color:black;" class="las la-bus-alt"></i></h1>
+        <div hidden data-id="<%= locals.id %>" id="qrcode"></div>
+        <% if(!locals.id) { %> 
+            <div class="pay-container">
+                <button hidden class="pay-btn btn">Pay Now! <i class="las la-money-check-alt"></i></button>
+                <p class="login-msg">Login to continue</p>
+            </div>
+        <% } else { %>
+            <div class="pay-container">
+                <button class="pay-btn btn">Pay Now! <i class="pay-icon las la-money-check-alt"></i></button>
+                <p hidden class="login-msg">Login to continue</p>
+            </div>
+        <% } %>
+
+        <% if(!locals.id) { %>
+            <div class="balance">
+                <div hidden class="balance-amount">Your balance: Rs<span class="amt">0</span></div>
+                <form class="username" name="username">
+                    <input class="username-input" type="text" placeholder="Your name"/>
+                    <button class="btn" type="submit">Set Name</button>
+                </form>
+                <form hidden name="balance">
+                    <input class="balance-input" type="number" max="100000" placeholder="Top up amount"/>
+                    <button class="btn" type="submit">Top Up</button>
+                </form>
+            </div>
+        <% } else { %>
+            <form hidden class="username" name="username">
+                <input class="username-input" type="text" placeholder="Your name"/>
+                <button class="btn" type="submit">Set Name</button>
+            </form>
+            <div class="balance">
+                <div class="balance-amount">Your balance: Rs<span class="amt"><%= balance %></span></div>
+                <form name="balance">
+                    <input class="balance-input" type="number" max="100000" placeholder="Top up amount"/>
+                    <button class="btn" type="submit">Top Up</button>
+                </form>
+            </div>
+        <% } %>
+    </div>
+
+    <div class="deducted-amt"></div>
+      
+</body>
+</html>

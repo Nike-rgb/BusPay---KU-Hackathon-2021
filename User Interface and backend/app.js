@@ -40,18 +40,6 @@ app.set('view engine', 'ejs');
 //serving static assets
 app.use(express.static('./public'));
 
-//configuring the event emitter
-const Emitter = require('events');
-const eventEmitter = new Emitter();
-app.set('eventEmitter', eventEmitter);
-
-//setting up the server socket
-require('./controllers/socketController')(server, eventEmitter);
-
-//parsing the json req payload
-app.use(express.json());
-
 //setting up the routes
 require('./resources/routes/web')(app);
-
 
