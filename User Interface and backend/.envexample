@@ -1,0 +1,3 @@
+MONGO_DB_URI= //put in your mongoDB URI here
+secret= //put in your secret key
+CONDUCTOR_APP_BASE_URL= //put in the origin of your conductor app to allow cors
