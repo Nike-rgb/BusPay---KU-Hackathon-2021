@@ -62,5 +62,26 @@ module.exports = function(app) {
         });
     });
 
+    //conductor routes
+    app.post('/conductor/deduct', (req, res) => {
+        let {id, deductedAmt} = req.body;
+        const eventEmitter = req.app.get('eventEmitter');
+        eventEmitter.emit('deduct', deductedAmt);
+        User.findOne({_id : id}, (err, user) => {
+            if(err) {
+                //handle error
+                throw err;
+            }
+            user.balance -= deductedAmt;
+            user.save((err, user) => {
+                if(err) {
+                    //handle error
+                    throw err;
+                }
+                res.end();
+            });
+        })
+    });
+
 }
 
